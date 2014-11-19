@@ -133,7 +133,7 @@ class ModelGenerator
         // Else, add in the primary key line overriding the defaults
         else
         {
-            return str_replace("    {{softDeletes}}\n", '', $modelFileContents);
+            return str_replace("    {{softDeletes}}".PHP_EOL, '', $modelFileContents);
         }
     }
 
@@ -151,7 +151,7 @@ class ModelGenerator
         // with its newline
         if ($primaryKey == 'id')
         {
-            return str_replace("    {{primaryKey}}\n", '', $modelFileContents);
+            return str_replace("    {{primaryKey}}".PHP_EOL, '', $modelFileContents);
         }
 
         // Else, add in the primary key line overriding the defaults
@@ -187,7 +187,7 @@ class ModelGenerator
         // Else remove the line
         else
         {
-            return str_replace("    {{tableName}}\n", '', $modelFileContents);
+            return str_replace("    {{tableName}}".PHP_EOL, '', $modelFileContents);
         }
     }
 
@@ -343,7 +343,7 @@ class ModelGenerator
     private function addRelationFunction($modelFileContents, $functionBlock)
     {
         return str_replace('    {{relationalFunctions}}',
-            "{$functionBlock}\n    {{relationalFunctions}}",
+            "{$functionBlock}".PHP_EOL."    {{relationalFunctions}}",
             $modelFileContents
         );
     }
@@ -356,7 +356,7 @@ class ModelGenerator
      */
     private function removeRelationFunctionTag($modelFileContents)
     {
-        return str_replace("\n" . '    {{relationalFunctions}}',
+        return str_replace(PHP_EOL . '    {{relationalFunctions}}',
             '',
             $modelFileContents
         );

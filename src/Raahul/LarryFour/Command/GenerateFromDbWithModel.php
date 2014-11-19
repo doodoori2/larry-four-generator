@@ -103,7 +103,7 @@ class GenerateFromDbWithModel extends GenerateFromDb {
 	    $parsed = $this->dbParser->parse($tablesData, true);
 
 	    // Generate migrations
-	    $this->generateMigrations($parsed['migrationList']->all());
+	    // $this->generateMigrations($parsed['migrationList']->all());
 
 	    // Generate models
 	    $this->generateModels($parsed['modelList']->all());
