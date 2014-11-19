@@ -2,6 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 use \Raahul\LarryFour\Command\Generate;
+use \Raahul\LarryFour\Command\GenerateFromDbWithModel;
 use \Raahul\LarryFour\Command\Models;
 use \Raahul\LarryFour\Command\Migrations;
 use \Raahul\LarryFour\Command\GenerateFromDb;
@@ -52,10 +53,16 @@ class LarryFourServiceProvider extends ServiceProvider {
 			return new GenerateFromDb;
 		});
 
+		// Initialize db command
+		$this->app['larry.fromdbwithmodel'] = $this->app->share(function($app) {
+			return new GenerateFromDbWithModel;
+		});
+
 		$this->commands('larry.generate');
 		$this->commands('larry.models');
 		$this->commands('larry.migrations');
 		$this->commands('larry.fromdb');
+		$this->commands('larry.fromdbwithmodel');
 	}
 
 	/**

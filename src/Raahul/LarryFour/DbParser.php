@@ -13,6 +13,12 @@ class DbParser
     private $migrationList;
 
     /**
+     * Instance of the model list object
+     * @var \Raahul\LarryFour\ModelList
+     */
+    private $modelList;
+
+    /**
      * Instance of the schema extractor
      * @var \Raahul\SchemaExtractor\SchemaExtractor
      */
@@ -25,9 +31,10 @@ class DbParser
     private $dbType;
 
 
-    public function __construct(MigrationList $migrationList, SchemaExtractor $schemaExtractor, $dbType)
+    public function __construct(MigrationList $migrationList, ModelList $modelList, SchemaExtractor $schemaExtractor, $dbType)
     {
         $this->migrationList = $migrationList;
+        $this->modelList = $modelList;
         $this->schemaExtractor = $schemaExtractor;
         $this->dbType = $dbType;
     }
@@ -37,16 +44,21 @@ class DbParser
      * For each table provided, parse it and add them to the migrationList. This function
      * can be called multiple times and it will keep adding tables to the same migrationList
      * @param  array  $tables An associative array of table name and an array of its columns
+     * @param  boolean $isModelDefinition Whether model definition is needed
      * @return MigrationList  The LarryFour migrationList object
      */
-    public function parse($tables)
+    public function parse($tables, $isModelDefinition)
     {
         foreach ($tables as $tableName => $columns)
         {
-            $this->createTableMigration($tableName, $columns);
+            $this->createTableMigration($tableName, $columns, $isModelDefinition);
         }
 
-        return $this->migrationList;
+        // Return result
+        return array(
+            'modelList' => $this->modelList,
+            'migrationList' => $this->migrationList
+        );
     }
 
 
@@ -55,8 +67,9 @@ class DbParser
      * parameters
      * @param  string $tableName The name of the table
      * @param  array  $columns   An array of SchemaExtractor Column objects
+     * @param  boolean $isModelDefinition Whether model definition is needed
      */
-    private function createTableMigration($tableName, $columns)
+    private function createTableMigration($tableName, $columns, $isModelDefinition)
     {
         // Get the parsed columns
         $parsedColumns = $this->schemaExtractor->extract($columns, $this->dbType);
@@ -67,6 +80,9 @@ class DbParser
         // Create a new migration
         $this->migrationList->create($modelName, $tableName);
 
+        // Create a new model
+        $isModelDefinition && $this->modelList->create($modelName, $tableName);
+
         // Now, proceed towards adding columns
         foreach ($parsedColumns as $column)
         {
@@ -76,6 +92,7 @@ class DbParser
             if ($type == 'increments')
             {
                 $this->migrationList->setPrimaryKey($modelName, $column->name);
+                $isModelDefinition && $this->modelList->setPrimaryKey($modelName, $column->name);
                 continue;
             }
 

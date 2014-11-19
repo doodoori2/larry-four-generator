@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 
 use \Raahul\LarryFour\Writer;
 use \Raahul\LarryFour\MigrationList;
+use \Raahul\LarryFour\ModelList;
 use \Raahul\LarryFour\Generator\MigrationGenerator;
 use \Raahul\LarryFour\DbParser;
 use \Raahul\SchemaExtractor\SchemaExtractor;
@@ -68,7 +69,7 @@ class GenerateFromDb extends Command {
         // Initialize the database parser
         // TODO: Use DB::getDriverName() instead of hardcoded database driver name
         // PostgreSQL isn't support by SchemaExtractor package. So we force it to use 'mysql' driver.
-        $this->dbParser = new DbParser(new MigrationList(), new SchemaExtractor(), 'mysql');
+        $this->dbParser = new DbParser(new MigrationList(), new ModelList(), new SchemaExtractor(), 'mysql');
     }
 
     /**
@@ -131,11 +132,11 @@ class GenerateFromDb extends Command {
             }
         }
 
-        // Get migrations
-        $migrationList = $this->dbParser->parse($tablesData);
+        // Get parsed
+        $parsed = $this->dbParser->parse($tablesData, false);
 
         // Generate migrations
-        $this->generateMigrations($migrationList->all());
+        $this->generateMigrations($parsed['migrationList']->all());
     }
 
     /**
